@@ -50,21 +50,21 @@ def check_assert(jexp, output_case):
   
 
 def j0_tests():
-    check_assert((JNum(4).pp()), "4")
-    check_assert((JNum(8).pp()), "8")
-    check_assert((JNum(6).pp()), "6")
-    check_assert((JNum(234).pp()),"234")
-    check_assert((JNum(8).interp()), 8)
-    check_assert((JNum(10).pp()), "10")
-    check_assert((JMult(JNum(8), JNum(9)).interp()), 72)
-    check_assert((JMult(JNum(3), JPlus(JNum(7), JNum(3))).interp()), 30)
-    check_assert((JMult(JNum(2), JPlus(JNum(9), JNum(123))).pp()), "(* 2 (+ 9 123))")
-    check_assert((JPlus(JNum(2),(JPlus(JNum(3), JNum(4)))).pp()), "(+ 2 (+ 3 4))")
-    check_assert((JMult(JNum(2), JNum(3)).pp()), "(* 2 3)")
+    check_assert((JNum(4).sexp()), 4)
+    check_assert((JNum(8).sexp()), 8)
+    check_assert((JNum(6).sexp()), 6)
+    check_assert((JNum(234).sexp()), 234)
+    check_assert((JNum(8).sexp()),8)
+    check_assert((JNum(10).sexp()), 10)
+    check_assert((JMult(JNum(8), JNum(9)).sexp()), ['*', 8, 9])
+    check_assert((JMult(JNum(3), JPlus(JNum(7), JNum(3))).sexp()), ['*', 3, ['+', 7, 3]])
+    check_assert((JMult(JNum(2), JPlus(JNum(9), JNum(123))).sexp()), ['*', 2, ['+', 9, 123]])
+    check_assert((JPlus(JNum(2),(JPlus(JNum(3), JNum(4)))).sexp()), ['+', 2, ['+', 3, 4]])
+    check_assert((JMult(JNum(2), JNum(3)).sexp()), ['*', 2, 3])
     check_assert((JMult(JPlus(JNum(8), JNum(2)), JPlus(JNum(9),
-    JNum(10))).pp()), "(* (+ 8 2) (+ 9 10))")
+    JNum(10))).sexp()), ['*', ['+', 8, 2], ['+', 9, 10]])
     check_assert((JPlus(JMult(JNum(8), JNum(2)), JMult(JNum(9),
-    JNum(10))).interp()), 106)
+    JNum(10))).sexp()), ['+', ['*', 8, 2], ['*', 9, 10]])
 
     print(JMult(JNum(2), JPlus(JNum(9), JNum(123))).sexp())
 
