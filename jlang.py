@@ -36,7 +36,13 @@ class JMult:
     def interp(self):
         return self.lhs.interp() * self.rhs.interp()
 
-
+def desugar(sexp):
+    if (type(sexp) == int):
+        return JNum(sexp)
+    elif(len(sexp) == 3 and sexp[0] == '*'):
+        return JMult(desugar(sexp[1]), desugar(sexp[2]))
+    elif(len(sexp) == 3 and sexp[0] == '+'):
+        return JPlus(desugar(sexp[1]), desugar(sexp[2]))
 
 def check_assert(jexp, output_case): 
     if (jexp == output_case):
@@ -46,8 +52,6 @@ def check_assert(jexp, output_case):
         print("TEST FAILED " + str(jexp) + " != " + str(output_case))
         return False
     return
-
-  
 
 def j0_tests():
     check_assert((JNum(4).sexp()), 4)
@@ -66,7 +70,14 @@ def j0_tests():
     check_assert((JPlus(JMult(JNum(8), JNum(2)), JMult(JNum(9),
     JNum(10))).sexp()), ['+', ['*', 8, 2], ['*', 9, 10]])
 
+    print(JMult(JNum(2), JPlus(JNum(9), JNum(123))).pp())
     print(JMult(JNum(2), JPlus(JNum(9), JNum(123))).sexp())
+
+    print(JMult(JNum(8), JNum(9)).sexp())
+    test = desugar(JMult(JNum(8), JNum(9)).sexp()).pp()
+    print(test)
+    print(['*', ['+', 8, 2], ['+', 9, 10]])
+    print(desugar(['*', ['+', 8, 2], ['+', 9, 10]]).pp())
 
 def main():
     j0_tests()
