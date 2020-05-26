@@ -135,9 +135,9 @@ def eval(inp, relate, cut):
            '<=': operator.le,
            '=': operator.eq}
     return ops[relate](inp, cut)
-    
+
 #def interp(ef, earg):
-    return delta(ef, earg)
+    #return delta(ef, earg)
 
 def desugar(sexp):
     if (type(sexp) == int):
