@@ -1,7 +1,9 @@
 import sys
+import operator
 from enum import Enum
 
 #J1 Object Language, Implemented in Python3
+
 class JNum:
     def __init__(self, n):
         self.n = n
@@ -28,7 +30,7 @@ class JIf:
         self.et = et
         self.ef = ef
     def pp(self):
-        return ("if " + self.ec.pp() + " " + self.et.pp() + " " + self.ef.pp())
+        return "(if " + self.ec.pp() + " " + self.et.pp() + " " + self.ef.pp() + ")"
     def sexp(self):
         return ['if', self.ec.sexp(), self.et.sexp(), self.ef.sexp()]
     def interp(self):
@@ -38,134 +40,126 @@ class JIf:
             return self.et.interp()
         
 class JPrim:
-    def __init__(self, n):
-        self.n = n
+    def __init__(self, prim):
+        self.prim = prim
     def pp(self):
-        return str(self.n)
+        if (self.prim == "Plus"):
+            return ('+')
+        elif (self.prim == "Sub"):
+            return ('-')
+        elif (self.prim == "Mult"):
+            return ('*')
+        elif (self.prim == "Div"):
+            return ('/')
+        elif (self.prim == "Equal"):
+            return ('=')
+        elif (self.prim == "Less"):
+            return ('<')
+        elif (self.prim == 'Leq'):
+            return ('<=')
+        elif (self.prim == 'Great'):
+            return ('>')
+        elif (self.prim == 'Geq'):
+            return ('>=')
     def sexp(self):
-        return self.n
+        if (self.prim == "Plus"):
+            return ('+')
+        elif (self.prim == "Sub"):
+            return ('-')
+        elif (self.prim == "Mult"):
+            return ('*')
+        elif (self.prim == "Div"):
+            return ('/')
+        elif (self.prim == "Equal"):
+            return ('=')
+        elif (self.prim == "Less"):
+            return ('<')
+        elif (self.prim == 'Leq'):
+            return ('<=')
+        elif (self.prim == 'Great'):
+            return ('>')
+        elif (self.prim == 'Geq'):
+            return ('>=')
     def interp(self):
-        return self.n
-
-class JPlus:
-    def __init__(self, lhs, rhs):
-        self.lhs = lhs
-        self.rhs = rhs
+        if (self.prim == "Plus"):
+            return ('+')
+        elif (self.prim == "Sub"):
+            return ('-')
+        elif (self.prim == "Equal"):
+            return ('=')
+        elif (self.prim == "Less"):
+            return ('<')
+        elif (self.prim == 'Leq'):
+            return ('<=')
+        elif (self.prim == 'Great'):
+            return ('>')
+        elif (self.prim == 'Geq'):
+            return ('>=')
+            
+class JApp:
+    def __init__ (self, list):
+        #Op case
+        self.prim = list[0]
+        self.varg = [list[1],list[2]]
+        #If Case
     def pp(self):
-        return ("(+ " + self.lhs.pp() + " " + self.rhs.pp() + ")")
+        return delta(self.prim, self.varg).pp()
     def sexp(self):
-        return ['+', self.lhs.sexp(), self.rhs.sexp()]
+        return delta(self.prim, self.varg).sexp()
     def interp(self):
-        return self.lhs.interp() + self.rhs.interp()
+        return delta(self.prim, self.varg).interp()
 
-class JSub:
-    def __init__(self, lhs, rhs):
-        self.lhs = lhs
-        self.rhs = rhs
+class delta:
+    def __init__(self, prim, varg):
+        self.prim = prim
+        self.varg = varg
+        #print(self.prim.pp())
+        #print(self.varg[0].pp())
+        #print(self.varg[1].pp())
     def pp(self):
-        return ("(- "+ self.lhs.pp() + " " + self.rhs.pp() + ")")
+        #print('delta-pp')
+        return ("(" + self.prim.pp() + " " + self.varg[0].pp() + " " + self.varg[1].pp() + ")")
     def sexp(self):
-        return ['-', self.lhs.sexp(), self.rhs.sexp()]
+        return [self.prim.sexp(), self.varg[0].sexp(), self.varg[1].sexp()]
     def interp(self):
-        return self.lhs.interp() - self.rhs.interp()
+        return eval(self.varg[0].interp(), self.prim.interp(), self.varg[1].interp())
 
-class JMult:
-    def __init__(self, lhs, rhs):
-        self.lhs = lhs
-        self.rhs = rhs
-    def pp(self):
-        return ("(* "+ self.lhs.pp() + " " + self.rhs.pp() + ")")
-    def sexp(self):
-        return ['*', self.lhs.sexp(), self.rhs.sexp()]
-    def interp(self):
-        return self.lhs.interp() * self.rhs.interp()
-
-class JDiv:
-    def __init__(self, lhs, rhs):
-        self.lhs = lhs
-        self.rhs = rhs
-    def pp(self):
-        return ("(/ "+ self.lhs.pp() + " " + self.rhs.pp() + ")")
-    def sexp(self):
-        return ['/', self.lhs.sexp(), self.rhs.sexp()]
-    def interp(self):
-        return self.lhs.interp() / self.rhs.interp()
-
-class JEquals:
-    def __init__(self, lhs, rhs):
-        self.lhs = lhs
-        self.rhs = rhs
-    def pp(self):
-        return ("(= "+ self.lhs.pp() + " " + self.rhs.pp() + ")")
-    def sexp(self):
-        return ['=', self.lhs.sexp(), self.rhs.sexp()]
-    def interp(self):
-        return self.lhs.interp() == self.rhs.interp()
-
-
-class JLess:
-    def __init__(self, lhs, rhs):
-        self.lhs = lhs
-        self.rhs = rhs
-    def pp(self):
-        return ("(< "+ self.lhs.pp() + " " + self.rhs.pp() + ")")
-    def sexp(self):
-        return ['<', self.lhs.sexp(), self.rhs.sexp()]
-    def interp(self):
-        return self.lhs.interp() < self.rhs.interp()
-
-class JLeq:
-    def __init__(self, lhs, rhs):
-        self.lhs = lhs
-        self.rhs = rhs
-    def pp(self):
-        return ("(<= "+ self.lhs.pp() + " " + self.rhs.pp() + ")")
-    def sexp(self):
-        return ['<=', self.lhs.sexp(), self.rhs.sexp()]
-    def interp(self):
-        return self.lhs.interp() <= self.rhs.interp()
-
-class JGreat:
-    def __init__(self, lhs, rhs):
-        self.lhs = lhs
-        self.rhs = rhs
-    def pp(self):
-        return ("(> "+ self.lhs.pp() + " " + self.rhs.pp() + ")")
-    def sexp(self):
-        return ['>', self.lhs.sexp(), self.rhs.sexp()]
-    def interp(self):
-        return self.lhs.interp() > self.rhs.interp()
-
-class JGeq:
-    def __init__(self, lhs, rhs):
-        self.lhs = lhs
-        self.rhs = rhs
-    def pp(self):
-        return ("(>= "+ self.lhs.pp() + " " + self.rhs.pp() + ")")
-    def sexp(self):
-        return ['>=', self.lhs.sexp(), self.rhs.sexp()]
-    def interp(self):
-        return self.lhs.interp() >= self.rhs.interp()
+#https://stackoverflow.com/questions/18591778/how-to-pass-an-operator-to-a-python-function
+def eval(inp, relate, cut):
+    ops = {'+': operator.add,
+           '*': operator.mul,
+           '/': operator.floordiv,
+           '>': operator.gt,
+           '<': operator.lt,
+           '>=': operator.ge,
+           '<=': operator.le,
+           '=': operator.eq}
+    return ops[relate](inp, cut)
+    
+#def interp(ef, earg):
+    return delta(ef, earg)
 
 def desugar(sexp):
     if (type(sexp) == int):
         return JNum(sexp)
     elif(len(sexp) == 3 and sexp[0] == '*'):
-        return JMult(desugar(sexp[1]), desugar(sexp[2]))
-    elif(len(sexp) == 3 and sexp[0] == '/'):
-        return JPlus(desugar(sexp[1]), desugar(sexp[2]))
+        return JApp([JPrim('Mult'), desugar(sexp[1]), desugar(sexp[2])])
     elif(len(sexp) == 3 and sexp[0] == '+'):
-        return JPlus(desugar(sexp[1]), desugar(sexp[2]))
+        return JApp([JPrim('Plus'), desugar(sexp[1]), desugar(sexp[2])])
     elif(len(sexp) == 3 and sexp[0] == '-'):
-        return JPlus(desugar(sexp[1]), desugar(sexp[2]))
-    elif(len(sexp) == 3 and sexp[0] == '<='):
-        return JPlus(desugar(sexp[1]), desugar(sexp[2]))
+        return JApp([JPrim('Sub'), desugar(sexp[1]), desugar(sexp[2])])
+    elif(len(sexp) == 3 and sexp[0] == '/'):
+        return JApp([JPrim('Div'), desugar(sexp[1]), desugar(sexp[2])])
     elif(len(sexp) == 3 and sexp[0] == '<'):
-        return JPlus(desugar(sexp[1]), desugar(sexp[2]))
+        return JApp([JPrim('Plus'), desugar(sexp[1]), desugar(sexp[2])])
+    elif(len(sexp) == 3 and sexp[0] == '<='):
+        return JApp([JPrim('Plus'), desugar(sexp[1]), desugar(sexp[2])])
     elif(len(sexp) == 3 and sexp[0] == '>'):
-        return JPlus(desugar(sexp[1]), desugar(sexp[2]))
+        return JApp([JPrim('Plus'), desugar(sexp[1]), desugar(sexp[2])])
     elif(len(sexp) == 3 and sexp[0] == '>='):
-        return JPlus(desugar(sexp[1]), desugar(sexp[2]))
+        return JApp([JPrim('Plus'), desugar(sexp[1]), desugar(sexp[2])])
+    elif(len(sexp) == 3 and sexp[0] == '='):
+        return JApp([JPrim('Plus'), desugar(sexp[1]), desugar(sexp[2])])
 
 def check_assert(jexp, output_case): 
     if (jexp == output_case):
@@ -176,35 +170,50 @@ def check_assert(jexp, output_case):
         return False
     return
 
+def j1_tests():
+    check_assert(JApp([JPrim('Plus'), JNum(1), JNum(2)]).pp(), "(+ 1 2)")
+    check_assert(JApp([JPrim('Plus'), JNum(1), JNum(2)]).sexp(), ['+', 1, 2])
+    check_assert(desugar(JApp([JPrim('Div'), JNum(1), JNum(2)]).sexp()).pp(), "(/ 1 2)")
+    check_assert(JApp([JPrim('Plus'), JNum(1), JNum(2)]).interp(), 3)
+    check_assert((JApp([JPrim('Mult'), JNum(3), JApp([JPrim('Plus'), JNum(7), JNum(3)])]).sexp()), ['*', 3, ['+', 7, 3]])
+    check_assert(JIf(JBool(True), JNum(5), JNum(4)).pp(), "(if True 5 4)")
+    return
 
-def j0_tests():
-    check_assert((JNum(4).sexp()), 4)
-    check_assert((JIf(JBool(True), JNum(8), JNum(9)).sexp()), ['if', True, 8, 9])
-    check_assert((JNum(6).sexp()), 6)
-    check_assert((JNum(234).sexp()), 234)
-    check_assert((JBool(True).sexp()),True)
-    check_assert((JNum(10).sexp()), 10)
-    check_assert((JLeq(JNum(8), JNum(9)).sexp()), ['<=', 8, 9])
-    check_assert((JMult(JNum(3), JPlus(JNum(7), JNum(3))).sexp()), ['*', 3, ['+', 7, 3]])
-    check_assert((JMult(JNum(2), JPlus(JNum(9), JNum(123))).sexp()), ['*', 2, ['+', 9, 123]])
-    check_assert((JSub(JNum(2),(JPlus(JNum(3), JNum(4)))).sexp()), ['-', 2, ['+', 3, 4]])
-    check_assert((JDiv(JNum(2), JNum(3)).sexp()), ['/', 2, 3])
-    check_assert((JMult(JPlus(JNum(8), JNum(2)), JPlus(JNum(9),
-    JNum(10))).sexp()), ['*', ['+', 8, 2], ['+', 9, 10]])
-    check_assert((JPlus(JMult(JNum(8), JNum(2)), JMult(JNum(9),
-    JNum(10))).sexp()), ['+', ['*', 8, 2], ['*', 9, 10]])
+#def j0_tests():
+    #check_assert((JNum(4).sexp()), 4)
+    #check_assert((JIf(JBool(True), JNum(8), JNum(9)).sexp()), ['if', True, 8, 9])
+    #check_assert((JNum(6).sexp()), 6)
+    #check_assert((JNum(234).sexp()), 234)
+    #check_assert((JBool(True).sexp()),True)
+    #check_assert((JNum(10).sexp()), 10)
+    #check_assert((JLeq(JNum(8), JNum(9)).sexp()), ['<=', 8, 9])
+    #check_assert((JMult(JNum(3), JPlus(JNum(7), JNum(3))).sexp()), ['*', 3, ['+', 7, 3]])
+    #check_assert((JMult(JNum(2), JPlus(JNum(9), JNum(123))).sexp()), ['*', 2, ['+', 9, 123]])
+    #check_assert((JSub(JNum(2),(JPlus(JNum(3), JNum(4)))).sexp()), ['-', 2, ['+', 3, 4]])
+    #check_assert((JDiv(JNum(2), JNum(3)).sexp()), ['/', 2, 3])
+    #check_assert((JMult(JPlus(JNum(8), JNum(2)), JPlus(JNum(9),
+    #JNum(10))).sexp()), ['*', ['+', 8, 2], ['+', 9, 10]])
+    #check_assert((JPlus(JMult(JNum(8), JNum(2)), JMult(JNum(9),
+    #JNum(10))).sexp()), ['+', ['*', 8, 2], ['*', 9, 10]])
 
-    print(JMult(JNum(2), JPlus(JNum(9), JNum(123))).pp())
-    print(JMult(JNum(2), JPlus(JNum(9), JNum(123))).sexp())
+    #print(JMult(JNum(2), JPlus(JNum(9), JNum(123))).pp())
+    #print(JMult(JNum(2), JPlus(JNum(9), JNum(123))).sexp())
 
-    print(JMult(JNum(8), JNum(9)).sexp())
-    test = desugar(JMult(JNum(8), JNum(9)).sexp()).pp()
-    print(test)
-    print(['*', ['+', 8, 2], ['+', 9, 10]])
-    print(desugar(['*', ['+', 8, 2], ['+', 9, 10]]).pp())
+    #print(JMult(JNum(8), JNum(9)).sexp())
+    #test = desugar(JMult(JNum(8), JNum(9)).sexp()).pp()
+    #print(test)
+    #print(['*', ['+', 8, 2], ['+', 9, 10]])
+    #print(desugar(['*', ['+', 8, 2], ['+', 9, 10]]).pp())
 
 def main():
-    j0_tests()
+    #j0_tests()
 
+    print(eval(1.0, '>', 0.0))  # prints True
+    print(eval(1.0, '<', 0.0))  # prints False
+    print(eval(1.0, '>=', 0.0))  # prints True
+    print(eval(1.0, '<=', 0.0))  # prints False
+    print(eval(1.0, '=', 0.0))  # prints False
+    j1_tests()
+    return
 
 main()
