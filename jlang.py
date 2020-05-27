@@ -142,6 +142,8 @@ def eval(inp, relate, cut):
 def desugar(sexp):
     if (type(sexp) == int):
         return JNum(sexp)
+    if (type(sexp) == bool):
+        return JBool(sexp)
     elif(len(sexp) == 3 and sexp[0] == '*'):
         return JApp([JPrim('Mult'), desugar(sexp[1]), desugar(sexp[2])])
     elif(len(sexp) == 3 and sexp[0] == '+'):
@@ -151,15 +153,17 @@ def desugar(sexp):
     elif(len(sexp) == 3 and sexp[0] == '/'):
         return JApp([JPrim('Div'), desugar(sexp[1]), desugar(sexp[2])])
     elif(len(sexp) == 3 and sexp[0] == '<'):
-        return JApp([JPrim('Plus'), desugar(sexp[1]), desugar(sexp[2])])
+        return JApp([JPrim('Less'), desugar(sexp[1]), desugar(sexp[2])])
     elif(len(sexp) == 3 and sexp[0] == '<='):
-        return JApp([JPrim('Plus'), desugar(sexp[1]), desugar(sexp[2])])
+        return JApp([JPrim('Leq'), desugar(sexp[1]), desugar(sexp[2])])
     elif(len(sexp) == 3 and sexp[0] == '>'):
-        return JApp([JPrim('Plus'), desugar(sexp[1]), desugar(sexp[2])])
+        return JApp([JPrim('Great'), desugar(sexp[1]), desugar(sexp[2])])
     elif(len(sexp) == 3 and sexp[0] == '>='):
-        return JApp([JPrim('Plus'), desugar(sexp[1]), desugar(sexp[2])])
+        return JApp([JPrim('Geq'), desugar(sexp[1]), desugar(sexp[2])])
     elif(len(sexp) == 3 and sexp[0] == '='):
-        return JApp([JPrim('Plus'), desugar(sexp[1]), desugar(sexp[2])])
+        return JApp([JPrim('Equal'), desugar(sexp[1]), desugar(sexp[2])])
+    elif(len(sexp) == 4 and sexp[0] == 'if'):
+        return JIf(desugar(sexp[1]), desugar(sexp[2]), desugar(sexp[3]))
 
 def check_assert(jexp, output_case): 
     if (jexp == output_case):
@@ -171,12 +175,28 @@ def check_assert(jexp, output_case):
     return
 
 def j1_tests():
+    check_assert(JPrim('Plus').pp(), '+')
+    check_assert(JPrim('Geq').pp(), '>=')
+    check_assert(JBool(True).sexp(), True)
     check_assert(JApp([JPrim('Plus'), JNum(1), JNum(2)]).pp(), "(+ 1 2)")
     check_assert(JApp([JPrim('Plus'), JNum(1), JNum(2)]).sexp(), ['+', 1, 2])
     check_assert(desugar(JApp([JPrim('Div'), JNum(1), JNum(2)]).sexp()).pp(), "(/ 1 2)")
     check_assert(JApp([JPrim('Plus'), JNum(1), JNum(2)]).interp(), 3)
     check_assert((JApp([JPrim('Mult'), JNum(3), JApp([JPrim('Plus'), JNum(7), JNum(3)])]).sexp()), ['*', 3, ['+', 7, 3]])
     check_assert(JIf(JBool(True), JNum(5), JNum(4)).pp(), "(if True 5 4)")
+    check_assert(desugar(JIf(JBool(True), JNum(5), JNum(4)).sexp()).pp(), "(if True 5 4)")
+    check_assert((JIf(JBool(True), JNum(8), JNum(9)).sexp()), ['if', True, 8, 9])
+    check_assert(
+        desugar(
+            JIf(
+                JApp(
+                    [JPrim('Equal'), JNum(8), (JApp([JPrim('Plus'), JNum(3), JNum(27)]))]
+                    ), 
+                JNum(8), 
+                JApp(
+                    [JPrim('Plus'), JNum(8), JNum(8)]
+                    )
+                ).sexp()).pp(), "(if (= 8 (+ 3 27)) 8 (+ 8 8))" ),  
     return
 
 #def j0_tests():
@@ -207,12 +227,6 @@ def j1_tests():
 
 def main():
     #j0_tests()
-
-    print(eval(1.0, '>', 0.0))  # prints True
-    print(eval(1.0, '<', 0.0))  # prints False
-    print(eval(1.0, '>=', 0.0))  # prints True
-    print(eval(1.0, '<=', 0.0))  # prints False
-    print(eval(1.0, '=', 0.0))  # prints False
     j1_tests()
     return
 
