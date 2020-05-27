@@ -38,7 +38,20 @@ class JIf:
             return self.ef.interp()
         else:
             return self.et.interp()
-        
+            
+class JApp:
+    def __init__ (self, list):
+        #Op case
+        self.prim = list[0]
+        self.varg = [list[1],list[2]]
+        #If Case
+    def pp(self):
+        return delta(self.prim, self.varg).pp()
+    def sexp(self):
+        return delta(self.prim, self.varg).sexp()
+    def interp(self):
+        return delta(self.prim, self.varg).interp()
+         
 class JPrim:
     def __init__(self, prim):
         self.prim = prim
@@ -95,19 +108,6 @@ class JPrim:
             return ('>')
         elif (self.prim == 'Geq'):
             return ('>=')
-            
-class JApp:
-    def __init__ (self, list):
-        #Op case
-        self.prim = list[0]
-        self.varg = [list[1],list[2]]
-        #If Case
-    def pp(self):
-        return delta(self.prim, self.varg).pp()
-    def sexp(self):
-        return delta(self.prim, self.varg).sexp()
-    def interp(self):
-        return delta(self.prim, self.varg).interp()
 
 class delta:
     def __init__(self, prim, varg):
