@@ -4,6 +4,8 @@ from enum import Enum
 
 #J1 Object Language, Implemented in Python3
 
+hole = None
+
 class JNum:
     def __init__(self, n):
         self.n = n
@@ -24,21 +26,6 @@ class JBool:
     def interp(self):
         return self.n
 
-class JIf:
-    def __init__(self, ec, et, ef):
-        self.ec = ec
-        self.et = et
-        self.ef = ef
-    def pp(self):
-        return "(if " + self.ec.pp() + " " + self.et.pp() + " " + self.ef.pp() + ")"
-    def sexp(self):
-        return ['if', self.ec.sexp(), self.et.sexp(), self.ef.sexp()]
-    def interp(self):
-        if (self.ec.interp() == False):
-            return self.ef.interp()
-        else:
-            return self.et.interp()
-            
 class JApp:
     def __init__ (self, list):
         #Op case
@@ -123,6 +110,53 @@ class delta:
         return [self.prim.sexp(), self.varg[0].sexp(), self.varg[1].sexp()]
     def interp(self):
         return eval(self.varg[0].interp(), self.prim.interp(), self.varg[1].interp())
+
+class JIf:
+    def __init__(self, ec, et, ef):
+        self.ec = ec
+        self.et = et
+        self.ef = ef
+    def pp(self):
+        return "(if " + self.ec.pp() + " " + self.et.pp() + " " + self.ef.pp() + ")"
+    def sexp(self):
+        return ['if', self.ec.sexp(), self.et.sexp(), self.ef.sexp()]
+    def interp(self):
+        if (self.ec.interp() == False):
+            return self.ef.interp()
+        else:
+            return self.et.interp()
+            
+def whatIf(ob):
+
+
+def step(ob):
+    if (isinstance(ob, JIf)):
+        if (ob.ec != False):
+            return ob.et
+
+        elif (ob.ec == False):
+            return ob.ef
+        
+        elif (isinstance(ob.ec, JApp)):
+            return (JIf(step(ob.ec), et, ef))
+
+    elif (isinstance(ob, JApp)):
+        return delta(ob.prim, ob.varg)
+
+
+
+
+#Takes contexts and plugs their redexes with expressions
+def plug(context, exp):
+
+    return 
+
+#Contexts -- how to define
+# - Describes a program where part of a program is missing
+#Application context
+
+#def find_redex():
+
 
 #https://stackoverflow.com/questions/18591778/how-to-pass-an-operator-to-a-python-function
 def eval(inp, relate, cut):
