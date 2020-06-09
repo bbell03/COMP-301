@@ -96,21 +96,6 @@ class JPrim:
         elif (self.prim == 'Geq'):
             return ('>=')
 
-class delta:
-    def __init__(self, prim, varg):
-        self.prim = prim
-        self.varg = varg
-        #print(self.prim.pp())
-        #print(self.varg[0].pp())
-        #print(self.varg[1].pp())
-    def pp(self):
-        #print('delta-pp')
-        return ("(" + self.prim.pp() + " " + self.varg[0].pp() + " " + self.varg[1].pp() + ")")
-    def sexp(self):
-        return [self.prim.sexp(), self.varg[0].sexp(), self.varg[1].sexp()]
-    def interp(self):
-        return eval(self.varg[0].interp(), self.prim.interp(), self.varg[1].interp())
-
 class JIf:
     def __init__(self, ec, et, ef):
         self.ec = ec
@@ -126,37 +111,85 @@ class JIf:
         else:
             return self.et.interp()
             
-def whatIf(ob):
+class list:
+    def __init__(self, dat):
+        self.list = []
+    def Cons(self, a, d):
+            self.a = a
+            self.d = d
+    def append(self):
+        return self.list
+    def appendCons(self):
+        return [self.a, self.d]
+
+class Hole:
+    def __init__(self):
+        self.hole = None
+    def pp(self):
+        return(" ")
+    def sexp(self):
+        return[" "]
+    def find_redex(self):
+        return self.hole
+    def plug(expression):
+        return expression
+
+class AppC:
+    def __init__(self, list1, context, list2):
+        self.list1 = list1
+        self.list2 = list2
+        self.context = context
+    def find_redex(self):
+        return context
+    def plug(self):
+        return 
+    
+class IfC:
+    def __init__(self, arg1, arg2, context):
+        self.arg1 = arg1
+        self.arg2 = arg2
+    def If1C(self):
+        return (JIf(context, arg1, arg2))
+    def If2C(self):
+        return(JIf(arg1, context, arg2))
+    def If3C(self):
+        return(JIf(arg1, arg2, context))
+    def find_redex(self):
+        return self.context
+    def plug(context, expression):
+        #Change
+        return self.expression 
 
 
 def step(ob):
-    if (isinstance(ob, JIf)):
+    if (isinstance(ob, JIf)): 
         if (ob.ec != False):
             return ob.et
-
         elif (ob.ec == False):
             return ob.ef
-        
         elif (isinstance(ob.ec, JApp)):
             return (JIf(step(ob.ec), et, ef))
-
     elif (isinstance(ob, JApp)):
         return delta(ob.prim, ob.varg)
+    elif (isinstance(ob, JNum) or isinstance(ob, JBool) or isinstance(ob, JPrim)):
+        return ob
+    elif (isinstance(ob, Hole)) or isinstance(ob, AppC) or isinstance(ob, IfC)):
+        return ob
 
-
-
-
-#Takes contexts and plugs their redexes with expressions
-def plug(context, exp):
-
-    return 
-
-#Contexts -- how to define
-# - Describes a program where part of a program is missing
-#Application context
-
-#def find_redex():
-
+class delta:
+    def __init__(self, prim, varg):
+        self.prim = prim
+        self.varg = varg
+        #print(self.prim.pp())
+        #print(self.varg[0].pp())
+        #print(self.varg[1].pp())
+    def pp(self):
+        #print('delta-pp')
+        return ("(" + self.prim.pp() + " " + self.varg[0].pp() + " " + self.varg[1].pp() + ")")
+    def sexp(self):
+        return [self.prim.sexp(), self.varg[0].sexp(), self.varg[1].sexp()]
+    def interp(self):
+        return eval(self.varg[0].interp(), self.prim.interp(), self.varg[1].interp())
 
 #https://stackoverflow.com/questions/18591778/how-to-pass-an-operator-to-a-python-function
 def eval(inp, relate, cut):
